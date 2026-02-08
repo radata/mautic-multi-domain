@@ -1,5 +1,5 @@
 {
-  "name": "am-dep/mautic-multi-domain",
+  "name": "radata/mautic-multi-domain",
   "description": "Mautic Multi Domain Plugin - support multiple tracking domains",
   "type": "mautic-plugin",
   "license": "MIT",
