@@ -79,13 +79,11 @@ class MultidomainController extends AbstractStandardFormController
     }
 
     /**
-     * @param int $page
-     *
      * @return JsonResponse|RedirectResponse|Response
      */
-    public function indexAction($page = 1)
+    public function indexAction(Request $request, int $page = 1)
     {
-        return parent::indexStandard($page);
+        return parent::indexStandard($request, $page);
     }
 
     /**
@@ -101,50 +99,41 @@ class MultidomainController extends AbstractStandardFormController
     /**
      * Generates edit form and processes post data.
      *
-     * @param int  $objectId
-     * @param bool $ignorePost
-     *
      * @return JsonResponse|Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction(Request $request, int $objectId, bool $ignorePost = false)
     {
-        return parent::editStandard($objectId, $ignorePost);
+        return parent::editStandard($request, $objectId, $ignorePost);
     }
 
     /**
      * Displays details on a multidomain.
      *
-     * @param $objectId
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function viewAction($objectId)
+    public function viewAction(Request $request, int $objectId)
     {
-        return parent::viewStandard($objectId, 'multidomain', 'plugin.multidomain');
+        return parent::viewStandard($request, $objectId, 'multidomain', 'plugin.multidomain');
     }
 
     /**
      * Clone an entity.
      *
-     * @param int $objectId
-     *
      * @return JsonResponse|RedirectResponse|Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction(Request $request, int $objectId)
     {
-        return parent::cloneStandard($objectId);
+        return parent::cloneStandard($request, $objectId);
     }
 
     /**
      * Deletes the entity.
      *
-     * @param int $objectId
-     *
      * @return JsonResponse|RedirectResponse
      */
-    public function deleteAction($objectId)
+    public function deleteAction(Request $request, int $objectId)
     {
-        return parent::deleteStandard($objectId);
+        return parent::deleteStandard($request, $objectId);
     }
 
     /**
@@ -152,8 +141,8 @@ class MultidomainController extends AbstractStandardFormController
      *
      * @return JsonResponse|RedirectResponse
      */
-    public function batchDeleteAction()
+    public function batchDeleteAction(Request $request)
     {
-        return parent::batchDeleteStandard();
+        return parent::batchDeleteStandard($request);
     }
 }
