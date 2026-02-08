@@ -11,35 +11,28 @@
 
 namespace MauticPlugin\MauticMultiDomainBundle\Model;
 
-use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticMultiDomainBundle\Entity\Multidomain;
 use MauticPlugin\MauticMultiDomainBundle\Event\MultidomainEvent;
 use MauticPlugin\MauticMultiDomainBundle\Form\Type\MultidomainType;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class MultidomainModel extends FormModel
 {
-    /**
-     * @var ContainerAwareEventDispatcher
-     */
-    protected $dispatcher;
-
     /**
      * @var \Mautic\FormBundle\Model\FormModel
      */
@@ -51,11 +44,6 @@ class MultidomainModel extends FormModel
     protected $trackableModel;
 
     /**
-     * @var TemplatingHelper
-     */
-    protected $templating;
-
-    /**
      * @var FieldModel
      */
     protected $leadFieldModel;
@@ -65,30 +53,25 @@ class MultidomainModel extends FormModel
      */
     protected $contactTracker;
 
-    /**
-     * 
-     * @var EntityManager $entityManager
-     */
-    private static $entityManager;
-    /**
-     * MultidomainModel constructor.
-     */
     public function __construct(
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper,
         \Mautic\FormBundle\Model\FormModel $formModel,
         TrackableModel $trackableModel,
-        TemplatingHelper $templating,
-        EventDispatcherInterface $dispatcher,
         FieldModel $leadFieldModel,
         ContactTracker $contactTracker,
-        EntityManager $entityManager
     ) {
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
         $this->formModel      = $formModel;
         $this->trackableModel = $trackableModel;
-        $this->templating     = $templating;
-        $this->dispatcher     = $dispatcher;
         $this->leadFieldModel = $leadFieldModel;
         $this->contactTracker = $contactTracker;
-        static::$entityManager = $entityManager;
     }
 
     /**
@@ -109,15 +92,8 @@ class MultidomainModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param object                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param null                                $action
-     * @param array                               $options
-     *
-     * @throws NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Multidomain) {
             throw new MethodNotAllowedHttpException(['Multidomain']);
@@ -142,12 +118,8 @@ class MultidomainModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param null $id
-     *
-     * @return Multidomain
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?object
     {
         if (null === $id) {
             return new Multidomain();
@@ -162,7 +134,7 @@ class MultidomainModel extends FormModel
      * @param Multidomain      $entity
      * @param bool|false $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
         $this->getRepository()->saveEntity($entity);
@@ -179,7 +151,6 @@ class MultidomainModel extends FormModel
         return bin2hex(random_bytes(16)).$messageIdSuffix;
     }
 
-    
     /**
      * Get whether the color is light or dark.
      *
@@ -202,12 +173,8 @@ class MultidomainModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool|MultidomainEvent|void
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Multidomain) {
             throw new MethodNotAllowedHttpException(['Multidomain']);
@@ -236,12 +203,12 @@ class MultidomainModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     // Get path of the config.php file.
@@ -249,5 +216,4 @@ class MultidomainModel extends FormModel
     {
         return include dirname(__DIR__).'/Config/config.php';
     }
-
 }

@@ -9,11 +9,11 @@ return [
         'main' => [
             'mautic_multidomain_index' => [
                 'path'       => '/multidomain/{page}',
-                'controller' => 'MauticMultiDomainBundle:Multidomain:index',
+                'controller' => 'MauticPlugin\MauticMultiDomainBundle\Controller\MultidomainController::indexAction',
             ],
             'mautic_multidomain_action' => [
                 'path'       => '/multidomain/{objectAction}/{objectId}',
-                'controller' => 'MauticMultiDomainBundle:Multidomain:execute',
+                'controller' => 'MauticPlugin\MauticMultiDomainBundle\Controller\MultidomainController::executeAction',
             ],
         ],
         'api' => [
@@ -21,7 +21,7 @@ return [
                 'standard_entity' => true,
                 'name' => 'multidomain',
                 'path' => '/multidomain',
-                'controller' => 'MauticMultiDomainBundle:Api\MultidomainApi',
+                'controller' => 'MauticPlugin\MauticMultiDomainBundle\Controller\Api\MultidomainApiController',
             ],
         ],
     ],
@@ -44,15 +44,19 @@ return [
             'mautic.multidomain.model.multidomain' => [
                 'class'     => \MauticPlugin\MauticMultiDomainBundle\Model\MultidomainModel::class,
                 'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.security',
+                    'event_dispatcher',
+                    'router',
+                    'translator',
+                    'mautic.helper.user',
+                    'monolog.logger.mautic',
+                    'mautic.helper.core_parameters',
                     'mautic.form.model.form',
                     'mautic.page.model.trackable',
-                    'mautic.helper.templating',
-                    'event_dispatcher',
                     'mautic.lead.model.field',
                     'mautic.tracker.contact',
-                    'doctrine.orm.entity_manager',
                 ],
-                //'public' => true,
                 'alias' => 'model.multidomain.multidomain'
             ],
         ],
@@ -86,7 +90,7 @@ return [
             'mautic.multidomain.subscriber.buildjssubscriber' => [
                 'class'     => \MauticPlugin\MauticMultiDomainBundle\EventListener\BuildJsSubscriber::class,
                 'arguments' => [
-                    'templating.helper.assets',
+                    'Mautic\CoreBundle\Twig\Helper\AssetsHelper',
                     'request_stack',
                     'router',
                 ],

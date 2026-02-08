@@ -1,10 +1,10 @@
 {
-  "name": "icecubenz/mauticmultidomain",
+  "name": "am-dep/mautic-multi-domain",
   "description": "Mautic Multi Domain Plugin - support multiple tracking domains",
   "type": "mautic-plugin",
   "license": "MIT",
   "require": {
-    "mautic/core-lib": "^4.0"
+    "mautic/core-lib": "^5.0 || ^6.0 || ^7.0"
   },
   "extra": {
     "install-directory-name": "MauticMultiDomainBundle"

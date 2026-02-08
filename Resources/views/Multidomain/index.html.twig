@@ -1,0 +1,29 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}multidomain{% endblock %}
+
+{% block headerTitle %}{{ 'mautic.multidomain.title'|trans }}{% endblock %}
+
+{% block actions %}
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+        'templateButtons': {
+            'new': permissions['multidomain:items:create']
+        },
+        'routeBase': 'multidomain'
+    }) }}
+{% endblock %}
+
+{% block content %}
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+        'searchValue': searchValue,
+        'searchHelp': 'mautic.core.help.searchcommands',
+        'action': currentRoute
+    }) }}
+    <div class="page-list">
+        {% block _content %}
+            {{ include('@MauticMultiDomain/Multidomain/list.html.twig') }}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}
