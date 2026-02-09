@@ -10,6 +10,7 @@ return [
             'mautic_multidomain_index' => [
                 'path'       => '/multidomain/{page}',
                 'controller' => 'MauticPlugin\MauticMultiDomainBundle\Controller\MultidomainController::indexAction',
+                'defaults'   => ['page' => 1],
             ],
             'mautic_multidomain_action' => [
                 'path'       => '/multidomain/{objectAction}/{objectId}',
@@ -30,7 +31,7 @@ return [
             'mautic.multidomain.menu' => [
                 'route'    => 'mautic_multidomain_index',
                 'priority' => 10,
-                'iconClass' => 'fa-globe',
+                'iconClass' => 'ri-global-line',
             ],
         ],
     ],
