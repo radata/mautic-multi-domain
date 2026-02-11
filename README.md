@@ -18,14 +18,14 @@ https://www.youtube.com/watch?v=O8_pcHMXV-M
 
 ## Requirements
 
-- Mautic 5.x, 6.x or 7.x
+- Mautic 7.x (Docker FPM image)
 - PHP 8.0+
 
 ## Installation
 
 ### Via Composer (Docker)
 
-Ensure the composer directories exist with correct permissions:
+Ensure the composer and npm directories exist with correct permissions:
 
 ```bash
 docker exec --user root mautic_web mkdir -p /var/www/.composer/cache
@@ -50,14 +50,18 @@ docker exec --user www-data --workdir /var/www/html mautic_web \
   composer config repositories.mautic-multi-domain vcs \
   https://github.com/radata/mautic-multi-domain --no-interaction
 docker exec --user www-data --workdir /var/www/html mautic_web \
-  composer require radata/mautic-multi-domain:dev-main -W --no-interaction
+  composer require radata/mautic-multi-domain:dev-main \
+  -W --no-interaction --ignore-platform-req=ext-gd
 ```
+
+> The `--ignore-platform-req=ext-gd` flag is needed because the `mautic/mautic:7.0-fpm` Docker image has a broken GD CLI extension (`libavif.so.15` missing). GD works fine at runtime via PHP-FPM.
 
 Update to the latest version:
 
 ```bash
 docker exec --user www-data --workdir /var/www/html mautic_web \
-  composer update radata/mautic-multi-domain -W --no-interaction
+  composer update radata/mautic-multi-domain \
+  -W --no-interaction --ignore-platform-req=ext-gd
 ```
 
 If the npm post-install hook fails after composer require, fix it:
@@ -67,13 +71,6 @@ docker exec --user root mautic_web rm -rf /var/www/html/node_modules
 docker exec --user root mautic_web mkdir -p /var/www/.npm
 docker exec --user root mautic_web chown -R www-data:www-data /var/www/.npm
 docker exec --user www-data --workdir /var/www/html mautic_web npm ci --no-audit
-```
-
-### Manual Installation (docker cp)
-
-```bash
-docker cp plugins/MauticMultiDomainBundle mautic_web:/var/www/html/plugins/MauticMultiDomainBundle
-docker exec --user root mautic_web chown -R www-data:www-data /var/www/html/plugins/MauticMultiDomainBundle
 ```
 
 ### Post-Installation
@@ -104,6 +101,45 @@ REST API for managing domain mappings:
 ## Permissions
 
 The plugin uses the Mautic permissions system. Roles can be configured for domain management access.
+
+## Plugin Structure
+
+```
+plugins/MauticMultiDomainBundle/
+├── Assets/img/
+│   └── icon.png                             # Plugin icon
+├── Config/config.php                        # Service, route & menu registration
+├── Controller/
+│   ├── Api/
+│   │   └── MultidomainApiController.php     # REST API controller
+│   └── MultidomainController.php            # UI controller (list, create, edit, delete)
+├── Entity/
+│   ├── Multidomain.php                      # Domain mapping entity (email + domain)
+│   └── MultidomainRepository.php            # Database queries
+├── Event/
+│   └── MultidomainEvent.php                 # Custom event class
+├── EventListener/
+│   ├── BuilderSubscriber.php                # Rewrites tracking URLs in emails
+│   ├── BuildJsSubscriber.php                # Rewrites tracking JS domains
+│   └── MultidomianSubscriber.php            # Audit log & domain event handling
+├── Form/Type/
+│   └── MultidomainType.php                  # Domain mapping form
+├── Model/
+│   └── MultidomainModel.php                 # Business logic & domain lookups
+├── Resources/views/Multidomain/
+│   ├── details.html.twig                    # Detail view
+│   ├── form.html.twig                       # Create/edit form
+│   ├── index.html.twig                      # Index page
+│   └── list.html.twig                       # List table
+├── Security/Permissions/
+│   └── MultidomainPermissions.php           # Role-based access control
+├── Translations/
+│   └── en_US/
+│       ├── messages.ini
+│       └── validators.ini
+├── MauticMultiDomainBundle.php              # Bundle class
+└── composer.json
+```
 
 ## Uninstall
 
