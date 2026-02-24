@@ -91,7 +91,7 @@ return [
             'mautic.multidomain.subscriber.buildjssubscriber' => [
                 'class'     => \MauticPlugin\MauticMultiDomainBundle\EventListener\BuildJsSubscriber::class,
                 'arguments' => [
-                    'Mautic\CoreBundle\Twig\Helper\AssetsHelper',
+                    'twig.helper.assets',
                     'request_stack',
                     'router',
                 ],
