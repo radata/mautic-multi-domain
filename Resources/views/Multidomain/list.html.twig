@@ -31,13 +31,13 @@
                     {{ include('@MauticCore/Helper/list_actions.html.twig', {
                         'item': item,
                         'templateButtons': {
-                            'edit': securityHelper.hasEntityAccess(
+                            'edit': securityHasEntityAccess(
                                 permissions['multidomain:items:editown'],
                                 permissions['multidomain:items:editother'],
                                 item.createdBy
                             ),
                             'clone': permissions['multidomain:items:create'],
-                            'delete': securityHelper.hasEntityAccess(
+                            'delete': securityHasEntityAccess(
                                 permissions['multidomain:items:deleteown'],
                                 permissions['multidomain:items:deleteother'],
                                 item.createdBy
