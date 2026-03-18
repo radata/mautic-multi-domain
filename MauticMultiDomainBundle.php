@@ -32,6 +32,29 @@ class MauticMultiDomainBundle extends PluginBundleBase
     }
 
     /**
+     * Called during plugin update to migrate schema changes.
+     */
+    public static function onPluginUpdate(Plugin $plugin, ?object $factory = null, $metadata = null, $installedSchema = null): void
+    {
+        if ($factory === null || !method_exists($factory, 'getEntityManager')) {
+            return;
+        }
+
+        $em         = $factory->getEntityManager();
+        $connection = $em->getConnection();
+        $schema     = $connection->createSchemaManager()->introspectSchema();
+
+        if ($schema->hasTable('multi_domain')) {
+            $table = $schema->getTable('multi_domain');
+            if (!$table->hasColumn('title')) {
+                $connection->executeStatement(
+                    'ALTER TABLE multi_domain ADD COLUMN title VARCHAR(255) NULL DEFAULT NULL'
+                );
+            }
+        }
+    }
+
+    /**
      * Fix: plugin installer doesn't find metadata entities for the plugin
      * PluginBundle/Controller/PluginController:410.
      *

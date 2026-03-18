@@ -25,7 +25,12 @@ class Multidomain extends FormEntity
     private $id;
 
     /**
-     * 
+     * @var string|null
+     */
+    private $title;
+
+    /**
+     *
      * @var string
      */
     private $email;
@@ -86,7 +91,12 @@ class Multidomain extends FormEntity
 
         // Helper functions
         $builder->addId();
-        
+
+        $builder->createField('title', 'string')
+            ->columnName('title')
+            ->nullable()
+            ->build();
+
         $builder->createField('email', 'string')
             ->columnName('email')
             ->build();
@@ -108,6 +118,7 @@ class Multidomain extends FormEntity
             ->addListProperties(
                 [
                     'id',
+                    'title',
                     'email',
                     'domain',
                 ]
@@ -121,6 +132,17 @@ class Multidomain extends FormEntity
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(?string $title): Multidomain
+    {
+        $this->title = $title;
+        return $this;
     }
 
     public function getEmail(): ?string
@@ -146,16 +168,15 @@ class Multidomain extends FormEntity
     }
 
     /**
-     * Get Fake name to be compatable with getName of commonEntity. 
+     * Get Fake name to be compatible with getName of commonEntity.
      */
     public function getName()
     {
-        return $this->email;
+        return $this->title ?: $this->email;
     }
 
     /**
-     * Set Fake name to be compatable with getName of commonEntity. 
-     * 
+     * Set Fake name to be compatible with getName of commonEntity.
      */
     public function setName(string $email): Multidomain
     {

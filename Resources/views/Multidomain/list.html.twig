@@ -49,14 +49,12 @@
                 <td>
                     <div>
                         <a data-toggle="ajax" href="{{ path('mautic_multidomain_action', {'objectId': item.id, 'objectAction': 'view'}) }}">
-                            {{ item.email }}
+                            {{ item.title ?: item.email }}
                         </a>
                     </div>
-                    {% if item.domain %}
                     <div class="text-muted mt-4">
-                        <small>{{ item.domain }}</small>
+                        <small>{{ item.email }} &rarr; {{ item.domain }}</small>
                     </div>
-                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

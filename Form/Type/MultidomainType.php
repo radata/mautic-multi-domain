@@ -17,15 +17,20 @@ class MultidomainType extends AbstractType
     {
 
         $builder
+            ->add('title', TextType::class, [
+                'label'    => 'plugin.multidomain.title',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'placeholder' => 'plugin.multidomain.title.placeholder'],
+            ])
             ->add('email', TextType::class, [
-                'label' => 'plugin.multidomain.email',
+                'label'    => 'plugin.multidomain.email',
                 'required' => true,
-                'attr' => ['class' => 'form-control']
+                'attr'     => ['class' => 'form-control'],
             ])
             ->add('domain', TextType::class, [
-                'label' => 'plugin.multidomain.domain',
+                'label'    => 'plugin.multidomain.domain',
                 'required' => true,
-                'attr' => ['class' => 'form-control']
+                'attr'     => ['class' => 'form-control', 'placeholder' => 'https://'],
             ])
             ;
             

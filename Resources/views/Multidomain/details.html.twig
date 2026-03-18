@@ -2,7 +2,7 @@
 
 {% block mauticContent %}multidomain{% endblock %}
 
-{% block headerTitle %}{{ item.email }}{% endblock %}
+{% block headerTitle %}{{ item.title ?: item.email }}{% endblock %}
 
 {% block actions %}
     {{ include('@MauticCore/Helper/page_actions.html.twig', {
@@ -31,6 +31,17 @@
 <div class="box-layout">
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto bdr-r pa-md">
+        {% if item.title %}
+        <div class="row">
+            <div class="col-md-2">
+                <b>{{ 'plugin.multidomain.title'|trans }}:</b>
+            </div>
+            <div class="col-md-6">
+                {{ item.title }}
+            </div>
+        </div>
+        {% endif %}
+
         <div class="row">
             <div class="col-md-2">
                 <b>{{ 'plugin.multidomain.email'|trans }}:</b>
@@ -45,7 +56,7 @@
                 <b>{{ 'plugin.multidomain.domain'|trans }}:</b>
             </div>
             <div class="col-md-6">
-                <p>{{ item.domain }}</p>
+                <a href="{{ item.domain }}" target="_blank">{{ item.domain }}</a>
             </div>
         </div>
     </div>
